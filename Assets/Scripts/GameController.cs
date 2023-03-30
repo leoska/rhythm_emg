@@ -141,23 +141,13 @@ public class GameController : MonoBehaviour
 
         if (!(timer >= _nextNote.Current.Item1)) return;
 
-        GameObject newNote;
-        
-        switch (_nextNote.Current.Item2)
+        GameObject newNote = _nextNote.Current.Item2 switch
         {
-            case Notes.Red:
-                newNote = Instantiate(redNote, notesParent.transform);
-                break;
-            case Notes.Yellow:
-                newNote = Instantiate(yellowNote, notesParent.transform);
-                break;
-            case Notes.Green:
-                newNote = Instantiate(greenNote, notesParent.transform);
-                break;
-                
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            Notes.Red => Instantiate(redNote, notesParent.transform),
+            Notes.Yellow => Instantiate(yellowNote, notesParent.transform),
+            Notes.Green => Instantiate(greenNote, notesParent.transform),
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
         if (!_nextNote.MoveNext())
             _gameState = GameState.Ending;
