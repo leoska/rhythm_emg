@@ -10,9 +10,9 @@ public class GameController : MonoBehaviour
     private NoteActivator _greenActivator = null;
     private IEnumerator<ValueTuple<float, Notes>> _nextNote;
     private GameState _gameState = GameState.Loading;
-    private AudioSource _audioSource = null;
     private float _musicLength = 0f;
     private HudController _hudController = null;
+    private SoundController _soundController = null;
     private int _comboNotes = 0;
     private int _successNotes = 0;
     private const int MaxCombo = 8;
@@ -30,7 +30,6 @@ public class GameController : MonoBehaviour
     public int noteCount = 0;
     public float distanceBetweenActivatorAndSpawn = 41.25f;
     public float collisionPositionActivator = 2.5f;
-    public AudioSource noteSuccess = null;
 
     [Header("Prefab Red Note")] public GameObject redNote;
     [Header("Prefab Yellow Note")] public GameObject yellowNote;
@@ -66,8 +65,8 @@ public class GameController : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(this);
         
-        _audioSource = GetComponent<AudioSource>();
         _hudController = GetComponent<HudController>();
+        _soundController = GetComponent<SoundController>();
     }
 
     // Start is called before the first frame update
@@ -81,7 +80,7 @@ public class GameController : MonoBehaviour
     {
         while (musicTimer < _musicLength)
         {
-            musicTimer = _GetLengthMusic();
+            musicTimer = _soundController.GetMusicTime();
 
             var noteMovePerSec = gameNoteSpeed * (timer / musicTimer);
             var timerBeforeSpawn = distanceBetweenActivatorAndSpawn / noteMovePerSec;
@@ -106,11 +105,6 @@ public class GameController : MonoBehaviour
         }
 
         _ResumeGame();
-    }
-
-    private float _GetLengthMusic()
-    {
-        return _audioSource.time;
     }
 
     // Update is called once per frame
@@ -190,27 +184,24 @@ public class GameController : MonoBehaviour
 
         if (isFail)
         {
-            rock -= AddRock;
-            _comboNotes = 0;
-            combo = 1;
+            FailedNote();
+            return;
         }
-        else
+
+        rock += AddRock;
+
+        if (++_comboNotes >= comboNotesCount - 1 && combo < MaxCombo)
         {
-            rock += AddRock;
-
-            if (++_comboNotes >= comboNotesCount - 1 && combo < MaxCombo)
-            {
-                _comboNotes = 0;
-                combo *= 2;
-            }
-
-            score += AddScore * combo;
-            _hudController.UpdateNotes(++_successNotes, MusicController.NoteLength());
-            _hudController.UpdateScore(score);
-
-            noteSuccess.Play();
+            _comboNotes = 0;
+            combo *= 2;
         }
+
+        score += AddScore * combo;
+        _hudController.UpdateNotes(++_successNotes, MusicController.NoteLength());
+        _hudController.UpdateScore(score);
+
         _hudController.UpdateCombo(combo);
+        _soundController.SuccessNote();
     }
 
     // Just update game timer if game state is playing
@@ -287,10 +278,10 @@ public class GameController : MonoBehaviour
     // Star play music track
     private void _StartPlay()
     {
-        _musicLength = _audioSource.clip.length;
+        _musicLength = _soundController.GetMusicLength();
         _gameState = GameState.Playing;
         
-        _audioSource.Play();
+        _soundController.PlayMusic();
         StartCoroutine(_PlayTrack());
     }
     
@@ -298,8 +289,8 @@ public class GameController : MonoBehaviour
     private void _RestartGame()
     {
         StopCoroutine(nameof(_PlayTrack));
-        _audioSource.Stop();
-        
+        _soundController.StopMusic();
+
         foreach (Transform child in notesParent.transform)
         {
             Destroy(child.gameObject);
@@ -312,8 +303,8 @@ public class GameController : MonoBehaviour
     private void _PauseGame()
     {
         StopCoroutine(nameof(_PlayTrack));
-        _audioSource.Pause();
-        
+        _soundController.PauseMusic();
+
         gameSpeed = 0f;
         _gameState = GameState.Pause;
         
@@ -325,8 +316,8 @@ public class GameController : MonoBehaviour
         _hudController.HidePause();
         
         StartCoroutine(_PlayTrack());
-        _audioSource.UnPause();
-        
+        _soundController.UnPauseMusic();
+
         gameSpeed = 1f;
         _gameState = GameState.Playing;
     }
@@ -355,11 +346,14 @@ public class GameController : MonoBehaviour
         _greenActivator = noteActivator;
     }
 
-    public enum Notes
+    public void FailedNote()
     {
-        Red = 0,
-        Yellow = 1,
-        Green = 2,
+        rock -= AddRock;
+        _comboNotes = 0;
+        combo = 1;
+        
+        _hudController.UpdateCombo(combo);
+        _soundController.FailedNote();
     }
 
     private enum GameState
@@ -371,5 +365,11 @@ public class GameController : MonoBehaviour
         Ending = 4,
         Pause = 5,
         Continue = 6,
+    }
+    public enum Notes
+    {
+        Red = 0,
+        Yellow = 1,
+        Green = 2,
     }
 }

@@ -43,24 +43,9 @@ public class NoteActivator : MonoBehaviour
                     throw new ArgumentOutOfRangeException(nameof(noteType), noteType, null);
             }
         }
-        
-        Debug.Log(other.gameObject.name);
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.CompareTag("Activator Trigger"))
-        {
-            Fail();
-        }
     }
 
     public void Activate()
-    {
-        Destroy(gameObject.transform.parent.gameObject);
-    }
-
-    private void Fail()
     {
         Destroy(gameObject.transform.parent.gameObject);
     }

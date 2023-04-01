@@ -39,4 +39,12 @@ public class Note : MonoBehaviour
 
         transform.position = pos;
     }
+    
+    private void OnTriggerExit(Collider other)
+    {
+        if (!other.gameObject.CompareTag("Activator Trigger")) return;
+        
+        _gameController.FailedNote();
+        Destroy(gameObject);
+    }
 }

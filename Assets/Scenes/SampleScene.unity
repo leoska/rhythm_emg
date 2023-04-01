@@ -1707,7 +1707,7 @@ Transform:
   - {fileID: 197094564}
   - {fileID: 122422064}
   m_Father: {fileID: 1813347097}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
@@ -7317,7 +7317,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1813347097}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1304522169
 GameObject:
@@ -7330,7 +7330,7 @@ GameObject:
   - component: {fileID: 1304522170}
   - component: {fileID: 1304522171}
   - component: {fileID: 1304522174}
-  - component: {fileID: 1304522173}
+  - component: {fileID: 1304522175}
   - component: {fileID: 1304522172}
   m_Layer: 0
   m_Name: GameController
@@ -7374,7 +7374,6 @@ MonoBehaviour:
   noteCount: 0
   distanceBetweenActivatorAndSpawn: 41.25
   collisionPositionActivator: 2.5
-  noteSuccess: {fileID: 1813347098}
   redNote: {fileID: 5411333892179147910, guid: eb0450d14da0e405bba6458fb5e91dbd, type: 3}
   yellowNote: {fileID: 7622568713648815640, guid: 0821f1eea7c1d496eb769a6c4df4344a, type: 3}
   greenNote: {fileID: 887153476927163865, guid: d7c2e76669517459c993b6b4d9f6bc3a, type: 3}
@@ -7397,7 +7396,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: ce66ad0cba57148aba0e3ab161fce43d, type: 3}
+  m_audioClip: {fileID: 8300000, guid: d7ecb3e4caa984b7dac7e083630bfbd6, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -7483,31 +7482,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!169 &1304522173
-AudioLowPassFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1304522169}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_LowpassResonanceQ: 1
-  lowpassLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &1304522174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7527,6 +7501,21 @@ MonoBehaviour:
   pausePanel: {fileID: 1644308250}
   pauseTitle: {fileID: 76737478}
   musicProgress: {fileID: 604063031}
+--- !u!114 &1304522175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1304522169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00ee7cb1fc9194cd8bed757143a36209, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effects: {fileID: 1304522172}
+  music: {fileID: 1813347098}
+  musicFilter: {fileID: 1813347099}
 --- !u!1 &1397500406
 GameObject:
   m_ObjectHideFlags: 0
@@ -7560,7 +7549,7 @@ Transform:
   - {fileID: 1462429473}
   - {fileID: 1135034715}
   m_Father: {fileID: 1813347097}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1462429472
 GameObject:
@@ -7872,51 +7861,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &1528443314
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1528443316}
-  - component: {fileID: 1528443315}
-  m_Layer: 0
-  m_Name: Fail Collider
-  m_TagString: Fail Trigger
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
---- !u!65 &1528443315
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1528443314}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 2, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!4 &1528443316
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1528443314}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.85, z: -3.85}
-  m_LocalScale: {x: 12, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1813347097}
-  m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1534885861
 GameObject:
   m_ObjectHideFlags: 0
@@ -8103,6 +8047,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1813347097}
   - component: {fileID: 1813347098}
+  - component: {fileID: 1813347099}
   m_Layer: 0
   m_Name: GameScene
   m_TagString: Untagged
@@ -8129,7 +8074,6 @@ Transform:
   - {fileID: 1972142302}
   - {fileID: 1989915147}
   - {fileID: 902173498}
-  - {fileID: 1528443316}
   - {fileID: 1979411150}
   - {fileID: 1297499486}
   - {fileID: 699005456}
@@ -8147,7 +8091,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: adc43e9d49fb5452695f7962e04e14b9, type: 3}
+  m_audioClip: {fileID: 8300000, guid: ce66ad0cba57148aba0e3ab161fce43d, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.3
   m_Pitch: 1
@@ -8219,6 +8163,31 @@ AudioSource:
     m_PostInfinity: 2
     m_RotationOrder: 4
   reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!169 &1813347099
+AudioLowPassFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1813347096}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_LowpassResonanceQ: 1
+  lowpassLevelCustomCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -8335,7 +8304,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1813347097}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1989915147 stripped
 Transform:
