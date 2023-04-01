@@ -39,4 +39,14 @@ public static class MusicController
     {
         return ((IEnumerable<(float, GameController.Notes)>)_notesBuffer).GetEnumerator();
     }
+
+    public static int NoteLength()
+    {
+        if (_notesBuffer == null)
+        {
+            throw new NullReferenceException("noteBuffer is null!");
+        }
+
+        return _notesBuffer.Count;
+    }
 }

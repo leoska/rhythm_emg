@@ -35,7 +35,7 @@ public class Note : MonoBehaviour
             }
         }
 
-        pos.z -= move * Time.deltaTime;
+        pos.z -= move * Time.deltaTime * _gameController.gameSpeed;
 
         transform.position = pos;
     }

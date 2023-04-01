@@ -14,8 +14,10 @@ public class GameController : MonoBehaviour
     private float _musicLength = 0f;
     private HudController _hudController = null;
     private int _comboNotes = 0;
+    private int _successNotes = 0;
     private const int MaxCombo = 8;
-
+    private const int AddScore = 100;
+    private const int AddRock = 1;
 
     [Header("Score & Rock")] 
     public int score = 0;
@@ -28,6 +30,7 @@ public class GameController : MonoBehaviour
     public int noteCount = 0;
     public float distanceBetweenActivatorAndSpawn = 41.25f;
     public float collisionPositionActivator = 2.5f;
+    public AudioSource noteSuccess = null;
 
     [Header("Prefab Red Note")] public GameObject redNote;
     [Header("Prefab Yellow Note")] public GameObject yellowNote;
@@ -49,7 +52,9 @@ public class GameController : MonoBehaviour
     [Header("Camera")] public GameObject mainCamera;
 
     public static GameController Instance { get; private set; } = null;
-    
+
+    public static float MusicLength => Instance._musicLength;
+
     public void Awake()
     {
         if (Instance != null && Instance != this)
@@ -68,33 +73,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _gameState = GameState.Loading;
-        MusicController.ReadFromFile("Awolnation-Sail");
-        
-        _gameState = GameState.Start;
-        
-        score = 0;
-        rock = 5;
-        combo = 1;
-        _comboNotes = 0;
-
-        _redActivator = null;
-        _yellowActivator = null;
-        _greenActivator = null;
-        timer = 0f;
-        musicTimer = 0f;
-        _musicLength = 0f;
-        gameSpeed = 1;
-
-        _nextNote = MusicController.NextNote();
-
-        if (!_nextNote.MoveNext())
-            throw new Exception("nextNote iterator is empty on start!");
-        
-        _hudController.UpdateScore(score);
-        _hudController.UpdateCombo(combo);
-
-        Invoke(nameof(_StartPlay), 1f);
+        _StartGame();
     }
 
     // Coroutine for spawn next note and calculate music playing current time
@@ -107,20 +86,26 @@ public class GameController : MonoBehaviour
             var noteMovePerSec = gameNoteSpeed * (timer / musicTimer);
             var timerBeforeSpawn = distanceBetweenActivatorAndSpawn / noteMovePerSec;
             
-            _SpawnNextNote(musicTimer, timerBeforeSpawn);
+            // TODO: Это хак, чтобы первая нота не генерировалась на сцене, на первом кадре при делении на 0
+            if (musicTimer > 0.01f)
+                _SpawnNextNote(musicTimer, timerBeforeSpawn);
+            
+            _hudController.UpdateProgress((int)Math.Ceiling(musicTimer / _musicLength * 100));
 
             yield return null;
         }
     }
 
-    // Star play music track
-    private void _StartPlay()
+    private IEnumerator _ContinuePlay()
     {
-        _musicLength = _audioSource.clip.length;
-        _gameState = GameState.Playing;
-        
-        _audioSource.Play();
-        StartCoroutine(_PlayTrack());
+        _gameState = GameState.Continue;
+        for (var i = 3; i > 0; i--)
+        {
+            _hudController.ContinuePlay(i);
+            yield return new WaitForSeconds(1);
+        }
+
+        _ResumeGame();
     }
 
     private float _GetLengthMusic()
@@ -136,67 +121,59 @@ public class GameController : MonoBehaviour
         var isActivateGreen = Input.GetKeyDown(greenActivatorButton);
         var isRestartGame = Input.GetKeyDown(restartGame);
         var isPause = Input.GetKeyDown(KeyCode.Escape);
-
-        if (isActivateRed)
-        {
-            _TryActivate(Notes.Red);
-        } 
-        else if (isActivateYellow)
-        {
-            _TryActivate(Notes.Yellow);
-        } 
-        else if (isActivateGreen)
-        {
-            _TryActivate(Notes.Green);
-        }
+        
+        if (isActivateRed || isActivateYellow || isActivateGreen)
+            _TryActivate(isActivateRed ? Notes.Red : isActivateYellow ? Notes.Yellow : Notes.Green);
 
         if (isRestartGame)
         {
             _RestartGame();
         }
 
+        _UpdateGameTimer();
+        
         if (isPause)
         {
             if (_gameState == GameState.Pause)
             {
-                
+                StartCoroutine(_ContinuePlay());
             }
             else if (_gameState == GameState.Playing)
             {
-                gameSpeed = 0f;
-                _gameState = GameState.Pause;
+                _PauseGame();
             }
         }
-
-        _UpdateGameTimer();
     }
 
+    // Try Activate Red, Yellow or Green notes
     private void _TryActivate(Notes noteType)
     {
         var isFail = true;
-        const int addScore = 100;
-        const int addRock = 1;
-        
+
         switch (noteType)
         {
             case Notes.Red:
+            {
                 if (_redActivator != null)
                 {
                     isFail = false;
                     _redActivator.Activate();
                     _redActivator = null;
                 }
-                break;
 
+                break;
+            }
             case Notes.Yellow:
+            {
                 if (_yellowActivator != null)
                 {
-                        isFail = false;
-                        _yellowActivator.Activate();
-                        _yellowActivator = null;
-                } 
+                    isFail = false;
+                    _yellowActivator.Activate();
+                    _yellowActivator = null;
+                }
+
                 break;
-            
+            }
             case Notes.Green:
                 if (_greenActivator != null)
                 {
@@ -204,39 +181,46 @@ public class GameController : MonoBehaviour
                     _greenActivator.Activate();
                     _greenActivator = null;
                 }
+                
                 break;
             
             default:
                 throw new ArgumentOutOfRangeException(nameof(noteType), noteType, null);
         }
-        
+
         if (isFail)
         {
-            rock -= addRock;
+            rock -= AddRock;
             _comboNotes = 0;
+            combo = 1;
         }
         else
         {
-            score += addScore;
-            rock += addRock;
+            rock += AddRock;
 
-            if (_comboNotes >= comboNotesCount)
+            if (++_comboNotes >= comboNotesCount - 1 && combo < MaxCombo)
             {
                 _comboNotes = 0;
                 combo *= 2;
-                _hudController.UpdateCombo(combo);
             }
-            
+
+            score += AddScore * combo;
+            _hudController.UpdateNotes(++_successNotes, MusicController.NoteLength());
             _hudController.UpdateScore(score);
+
+            noteSuccess.Play();
         }
+        _hudController.UpdateCombo(combo);
     }
 
+    // Just update game timer if game state is playing
     private void _UpdateGameTimer()
     {
         if (_gameState == GameState.Playing)
             timer += Time.deltaTime;
     }
 
+    // Try to spawn next note
     private void _SpawnNextNote(float timeTimer, float timeBeforeSpawn = 0)
     {
         if (_gameState != GameState.Playing)
@@ -266,6 +250,51 @@ public class GameController : MonoBehaviour
             _gameState = GameState.Ending;
     }
 
+    private void _StartGame()
+    {
+        _gameState = GameState.Loading;
+        MusicController.ReadFromFile("Awolnation-Sail");
+        
+        _gameState = GameState.Start;
+        
+        score = 0;
+        rock = 5;
+        combo = 1;
+        _comboNotes = 0;
+        _successNotes = 0;
+
+        _redActivator = null;
+        _yellowActivator = null;
+        _greenActivator = null;
+        timer = 0f;
+        musicTimer = 0f;
+        _musicLength = 0f;
+        gameSpeed = 1;
+
+        _nextNote = MusicController.NextNote();
+
+        if (!_nextNote.MoveNext())
+            throw new Exception("nextNote iterator is empty on start!");
+        
+        _hudController.UpdateScore(score);
+        _hudController.UpdateCombo(combo);
+        _hudController.UpdateNotes(0, MusicController.NoteLength());
+        _hudController.UpdateProgress(0);
+
+        Invoke(nameof(_StartPlay), 0.5f);
+    }
+
+    // Star play music track
+    private void _StartPlay()
+    {
+        _musicLength = _audioSource.clip.length;
+        _gameState = GameState.Playing;
+        
+        _audioSource.Play();
+        StartCoroutine(_PlayTrack());
+    }
+    
+    // Restart game
     private void _RestartGame()
     {
         StopCoroutine(nameof(_PlayTrack));
@@ -276,7 +305,30 @@ public class GameController : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Start();
+        _StartGame();
+    }
+
+    // Pause game
+    private void _PauseGame()
+    {
+        StopCoroutine(nameof(_PlayTrack));
+        _audioSource.Pause();
+        
+        gameSpeed = 0f;
+        _gameState = GameState.Pause;
+        
+        _hudController.ShowPause();
+    }
+
+    private void _ResumeGame()
+    {
+        _hudController.HidePause();
+        
+        StartCoroutine(_PlayTrack());
+        _audioSource.UnPause();
+        
+        gameSpeed = 1f;
+        _gameState = GameState.Playing;
     }
 
     public void NoteCanActivateRed(NoteActivator noteActivator)
