@@ -7,7 +7,7 @@ public static class MusicController
 {
     private static List<ValueTuple<float, GameController.Notes>> _notesBuffer;
     private static readonly string[] SplitFile = { "\r\n", "\r", "\n" };
-    private static readonly char[] SplitLine = { ' ' };
+    private static readonly string[] SplitLine = { "\t", " " };
 
     public static void ReadFromFile(string textAssetName)
     {
@@ -22,7 +22,7 @@ public static class MusicController
         
         foreach (var line in lines)
         {
-            var data = line.Split(SplitLine, StringSplitOptions.None);
+            var data = line.Split(SplitLine, StringSplitOptions.RemoveEmptyEntries);
             var time = float.Parse(data[0], CultureInfo.InvariantCulture.NumberFormat);
             
             GameController.Notes note;
