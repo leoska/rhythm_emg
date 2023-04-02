@@ -11,9 +11,12 @@ public class SoundController : MonoBehaviour
     [Header("Effects")] 
     public AudioSource effects = null;
     public AudioClip failed = null;
+    public AudioClip menuButton = null;
+    public AudioClip selectTrack = null;
     
     [Header("Music")]
     public AudioSource music = null;
+    public AudioClip[] tracks = {};
     public AudioLowPassFilter musicFilter = null;
 
     public float GetMusicTime()
@@ -64,5 +67,22 @@ public class SoundController : MonoBehaviour
     {
         effects.clip = failed;
         effects.Play();
+    }
+
+    public void PlayButtonClick()
+    {
+        effects.clip = menuButton;
+        effects.Play();
+    }
+
+    public void PlaySelectTrack()
+    {
+        effects.clip = selectTrack;
+        effects.Play();
+    }
+
+    public void SelectTrack(int track)
+    {
+        music.clip = tracks[track];
     }
 }

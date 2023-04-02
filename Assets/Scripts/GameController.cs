@@ -19,11 +19,18 @@ public class GameController : MonoBehaviour
     private const int AddScore = 100;
     private const int AddRock = 1;
 
+    private static readonly string[] Tracks = 
+    {
+        "Awolnation-Sail",
+        "LeagueOfLegends-LegendsNeverDie",
+    };
+
     [Header("Score & Rock")] 
     public int score = 0;
     public int rock = 5;
     public int combo = 1;
     public int comboNotesCount = 5;
+    public int selectedTrack = 0;
     
     [Header("Note settings")] 
     [Range(5f, 25f)] public float gameNoteSpeed = 1f;
@@ -48,7 +55,13 @@ public class GameController : MonoBehaviour
 
     [Header("Notes Parent")] public GameObject notesParent;
 
-    [Header("Camera")] public GameObject mainCamera;
+    [Header("Camera")] 
+    public GameObject mainCamera;
+    public GameObject menuCamera;
+
+    [Header("Neon Scene")] public GameObject neonScene;
+
+    [Header("Menu Canvas")] public GameObject menuCanvas;
 
     public static GameController Instance { get; private set; } = null;
 
@@ -72,7 +85,7 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _StartGame();
+        EnterToMenu();
     }
 
     // Coroutine for spawn next note and calculate music playing current time
@@ -244,7 +257,14 @@ public class GameController : MonoBehaviour
     private void _StartGame()
     {
         _gameState = GameState.Loading;
-        MusicController.ReadFromFile("Awolnation-Sail");
+        MusicController.ReadFromFile(Tracks[selectedTrack]);
+        
+        neonScene.SetActive(true);
+
+        mainCamera.SetActive(true);
+        menuCamera.SetActive(false);
+        
+        menuCanvas.SetActive(false);
         
         _gameState = GameState.Start;
         
@@ -354,6 +374,52 @@ public class GameController : MonoBehaviour
         
         _hudController.UpdateCombo(combo);
         _soundController.FailedNote();
+    }
+
+    public void ApplicationQuit()
+    {
+        _soundController.PlayButtonClick();
+        Application.Quit();
+    }
+
+    public void EnterToMenu()
+    {
+        StopCoroutine(nameof(_PlayTrack));
+        _soundController.StopMusic();
+
+        foreach (Transform child in notesParent.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        _hudController.HidePause();
+        
+        _gameState = GameState.MainMenu;
+        
+        menuCanvas.SetActive(true);
+
+        menuCamera.SetActive(true);
+        mainCamera.SetActive(false);
+
+        neonScene.SetActive(false);
+    }
+
+    public void PlayTrack1()
+    {
+        selectedTrack = 0;
+        _soundController.PlaySelectTrack();
+        _soundController.SelectTrack(selectedTrack);
+        
+        Invoke(nameof(_StartGame), 0.3f);
+    }
+    
+    public void PlayTrack2()
+    {
+        selectedTrack = 1;
+        _soundController.PlaySelectTrack();
+        _soundController.SelectTrack(selectedTrack);
+        
+        Invoke(nameof(_StartGame), 0.3f);
     }
 
     private enum GameState
