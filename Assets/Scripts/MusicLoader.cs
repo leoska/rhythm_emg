@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static class MusicController
 {
-    private static List<ValueTuple<float, GameController.Notes>> _notesBuffer;
+    private static List<ValueTuple<float, GameController.Notes>> _notesBuffer = null;
     private static readonly string[] SplitFile = { "\r\n", "\r", "\n" };
     private static readonly string[] SplitLine = { "\t", " " };
 
@@ -48,5 +48,11 @@ public static class MusicController
         }
 
         return _notesBuffer.Count;
+    }
+
+    public static void Dispose()
+    {
+        _notesBuffer.Clear();
+        _notesBuffer = null;
     }
 }

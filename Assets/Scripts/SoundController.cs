@@ -10,6 +10,7 @@ public class SoundController : MonoBehaviour
     
     [Header("Effects")] 
     public AudioSource effects = null;
+    public AudioClip failed = null;
     
     [Header("Music")]
     public AudioSource music = null;
@@ -49,11 +50,19 @@ public class SoundController : MonoBehaviour
     {
         if (Math.Abs(musicFilter.cutoffFrequency - FailedFrequency) > 0.01f)
             musicFilter.cutoffFrequency = FailedFrequency;
+        
+        Invoke(nameof(PlayFailed), 0.3f);
     }
 
     public void SuccessNote()
     {
         if (Math.Abs(musicFilter.cutoffFrequency - SuccessFrequency) > 0.01f)
             musicFilter.cutoffFrequency = SuccessFrequency;
+    }
+
+    public void PlayFailed()
+    {
+        effects.clip = failed;
+        effects.Play();
     }
 }

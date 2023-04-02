@@ -7514,6 +7514,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   effects: {fileID: 1304522172}
+  failed: {fileID: 8300000, guid: adc43e9d49fb5452695f7962e04e14b9, type: 3}
   music: {fileID: 1813347098}
   musicFilter: {fileID: 1813347099}
 --- !u!1 &1397500406
@@ -8054,7 +8055,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1813347097
 Transform:
   m_ObjectHideFlags: 0
