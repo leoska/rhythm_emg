@@ -54,6 +54,11 @@ public class GameController : MonoBehaviour
     public float gameSpeed = 1;
 
     [Header("Notes Parent")] public GameObject notesParent;
+    
+    [Header("Notes Activators")]
+    public GameObject redActivator;
+    public GameObject yellowActivator;
+    public GameObject greenActivator;
 
     [Header("Camera")] 
     public GameObject mainCamera;
@@ -167,6 +172,7 @@ public class GameController : MonoBehaviour
                     _redActivator.Activate();
                     _redActivator = null;
                 }
+                StartCoroutine(ShowCube(redActivator));
 
                 break;
             }
@@ -178,6 +184,7 @@ public class GameController : MonoBehaviour
                     _yellowActivator.Activate();
                     _yellowActivator = null;
                 }
+                StartCoroutine(ShowCube(yellowActivator));
 
                 break;
             }
@@ -188,6 +195,7 @@ public class GameController : MonoBehaviour
                     _greenActivator.Activate();
                     _greenActivator = null;
                 }
+                StartCoroutine(ShowCube(greenActivator));
                 
                 break;
             
@@ -420,6 +428,21 @@ public class GameController : MonoBehaviour
         _soundController.SelectTrack(selectedTrack);
         
         Invoke(nameof(_StartGame), 0.3f);
+    }
+
+    public IEnumerator ShowCube(GameObject activator)
+    {
+        foreach (Transform child in activator.transform)
+        {
+            child.gameObject.SetActive(true);
+        }
+
+        yield return new WaitForSeconds(0.5f);
+        
+        foreach (Transform child in activator.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
     }
 
     private enum GameState

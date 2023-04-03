@@ -7,10 +7,14 @@ public class NoteActivator : MonoBehaviour
 {
 
     public GameController.Notes noteType = GameController.Notes.Red;
+    public Mesh notActivated = null;
+    public Mesh activated = null;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        var meshFilter = GetComponent<MeshFilter>();
+        meshFilter.mesh = notActivated;
     }
 
     // Update is called once per frame
@@ -47,6 +51,10 @@ public class NoteActivator : MonoBehaviour
 
     public void Activate()
     {
-        Destroy(gameObject.transform.parent.gameObject);
+        var meshFilter = GetComponent<MeshFilter>();
+        meshFilter.mesh = activated;
+        transform.parent.GetComponent<Note>().Activate();
+        
+        //Destroy(gameObject.transform.parent.gameObject);
     }
 }

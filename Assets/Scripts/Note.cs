@@ -5,13 +5,14 @@ public class Note : MonoBehaviour
 {
     private GameController _gameController = GameController.Instance;
     private const float Tolerance = 0.05f;
+    private bool _isActive = false;
     
     public float TimerCollisionActivator { private get; set; }
 
     // Start is called before the first frame update
     private void Start()
     {
-        
+        _isActive = false;
     }
 
     // Update is called once per frame
@@ -44,7 +45,14 @@ public class Note : MonoBehaviour
     {
         if (!other.gameObject.CompareTag("Activator Trigger")) return;
         
-        _gameController.FailedNote();
+        if (!_isActive)
+            _gameController.FailedNote();
+        
         Destroy(gameObject);
+    }
+
+    public void Activate()
+    {
+        _isActive = true;
     }
 }

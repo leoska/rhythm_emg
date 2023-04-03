@@ -99,6 +99,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   noteType: 0
+  notActivated: {fileID: 4469358936649225630, guid: 006c25cc970662342bf7e383842b49f2, type: 3}
+  activated: {fileID: 4414471651703448347, guid: 006c25cc970662342bf7e383842b49f2, type: 3}
 --- !u!65 &7799436935361275118
 BoxCollider:
   m_ObjectHideFlags: 0
